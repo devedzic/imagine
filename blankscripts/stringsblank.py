@@ -7,7 +7,8 @@ import settings
 
 
 def demonstrate_formatting():
-    """Using classical formatting.
+    """Demonstrating details of string formatting.
+    - using classical formatting
     - \n is the new line char
     - r'...' - raw formatting
     - using \"\"\"...\"\"\" for multi-line formatting
@@ -31,7 +32,7 @@ def demonstrate_fancy_formatting_with_f_strings():
 
 def demonstrate_string_operations():
     """Using different string operations.
-    - endswith(), split(), center(), in (aka contains()), == (aka equals(), len(),...), strip() (lstrip(), rstrip())
+    - endswith(), split(), center(), in (aka contains()), == (aka equals()), len(), ..., strip() (lstrip(), rstrip())
     """
 
 

@@ -1,3 +1,7 @@
+"""The very first Python script - main.py.
+"""
+
+
 # Hello world: the print() built-in function and the + operator.
 
 
