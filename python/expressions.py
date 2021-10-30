@@ -2,7 +2,6 @@
 """
 
 from settings import *
-from datetime import date
 
 
 def demonstrate_arithmetic_operators():
@@ -11,7 +10,7 @@ def demonstrate_arithmetic_operators():
     The integer division operator: //
     """
 
-    print(((13 // 3) ** 2) % 5 - 2)
+    print((45 // 12) % 3 - 200)
 
 
 def demonstrate_relational_operators():
@@ -22,67 +21,65 @@ def demonstrate_relational_operators():
     - None in comparisons, type(None)
     """
 
-    if 12 > 13:
-        print('12 > 13')
+    print(2 > 3)
+    if 0:
+        print(True)
     else:
-        print('12 not > 13')
+        print(False)
     print()
 
-    d1 = date.today()
-    d2 = date.today()
-    if d1 == d2:
-        print('d1 = d2')
-    else:
-        print('d1 != d2')
-    print()
-
-    print(id(d1))
-    print(id(d2))
-    print(d1 is d2)
-    print()
-
+    from datetime import date
     d1 = date(1971, 10, 11)
     d2 = date.today()
+
     if d1 > d2:
         print('d1 > d2')
     else:
-        print('d1 not > d2')
+        print('d2 >= d1')
     print()
 
-    # a = None
-    # try:
-    #     print(d1 > a)
-    # except:
-    #     raise TypeError('My TypeError')
-    # print(None)
-    # print(type(None))
-    # print(type(True))
+    print(d1 is date(1971, 10, 11))
+    print(d1 == date(1971, 10, 11))
+    print('id(d1):', id(d1))
+    print('id(d2):', id(d2))
+    print()
+
+    print(type(None))
+    print(d1 == None)
+    print(not None)
+    print()
 
 
 def demonstrate_logical_operators():
     """Working with logical operators.
     - logical operations with True, False and None
     - logical operations with dates
+        - make sure to read this: https://docs.python.org/3/library/stdtypes.html#boolean-operations-and-or-not !!!
+          (or just this: https://stackoverflow.com/questions/44612144/logical-operators-in-python)
     - logical operations with None (incl. None and int, None and date, etc.)
     - None and date vs. None > date
     """
 
-    print(True and False)
-    print(True and None)
-    print(None or False)
-    print(None or None)
-    print()
-
+    from datetime import date
     d1 = date(1971, 10, 11)
-    print(d1 and None)
-    print(d1 or None)
-    if d1: print(d1)
-    if 0.0: print(0.0)
-    else: print('-----')
+    d2 = date.today()
+
+    print(True and False)
+    print(True or False)
+    print(True and not False)
+    print(True and None)
+    print(None or d1)
     print()
 
-    # if None > d1: print()
-    # print()
+    print(1 and None)
+    print(1 or None)
+    print(1 or not None)
+    print(not None)
+    print()
+
+    print(None or d1)
+    # print(None > d1)
+    print()
 
 
 if __name__ == '__main__':

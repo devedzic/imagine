@@ -1,8 +1,6 @@
 """Demonstrates working with lists.
 """
 
-from settings import *
-
 
 def demonstrate_lists():
     """Using just the simplest operations with lists.
@@ -13,27 +11,21 @@ def demonstrate_lists():
     - looping through a list
     """
 
-    imagine = ['Imagine', 1971, True, 'John Lennon']
+    imagine = ['Imagine', 1971, True]
     print(imagine)
     print()
 
     print(imagine[0])
-    print(imagine[0:3])
-    print(imagine[-2:])
+    print(imagine[0:-1])
     print()
 
-    print(imagine == ['Imagine', 1971, True, 'John Lennon'])
-    print(imagine is ['Imagine', 1971, True, 'John Lennon'])
+    print(imagine == ['Imagine', 1971, True])
+    print(imagine is ['Imagine', 1971, True])
+    print(imagine + ['John Lennon', 'Klaus Voormann'])
     print()
 
-    from datetime import date
-    print(imagine + ['Klaus Voormann', date(1971, 10, 11)])
-    print(imagine + ['Klaus Voormann', str(date(1971, 10, 11))])
-    print()
-
-    for item in (imagine + ['Klaus Voormann', str(date(1971, 10, 11))]):
-        print(str(item))
-    print()
+    for item in (imagine + ['John Lennon', 'Klaus Voormann']):
+        print(item)
 
 
 def demonstrate_list_methods():
@@ -52,49 +44,34 @@ def demonstrate_list_methods():
     for the occurrence of a given element.
     """
 
-    imagine = ['Imagine', 1971, True, 'John Lennon']
-
-    # print(imagine.append('Klaus Voormann'))
-    imagine.append('Klaus Voormann')
+    imagine = ['Imagine', 1971, True]
     print(imagine)
     print()
 
+    print(imagine.append('John Lennon'))
+    print(imagine)
     from datetime import date
-    imagine.insert(3, str(date(1971, 10, 11).strftime(PREFERRED_DATE_FORMAT)))
+    d = date(1971, 10, 11)
+    imagine.insert(2, str(d))
     print(imagine)
-    print()
-
-    imagine.remove(1971)
+    imagine.remove('1971-10-11')
     print(imagine)
-    print()
-
+    imagine.pop()
+    print(imagine)
+    imagine.append('John Lennon')
     imagine.pop(2)
     print(imagine)
-    print()
-
-    imagine.extend(('Klaus Voormann', str(date(1971, 10, 11).strftime(PREFERRED_DATE_FORMAT))))
-    # imagine.extend('Ono')
+    imagine.extend(['Imagine'])
     print(imagine)
-    print()
-
-    imagine.extend([1971, 1971])
-    i = imagine.count(1971)
-    print(imagine)
-    print(i)
-    print()
-
-    print(imagine.index(1971))
-    # print(imagine.index(1971, 0, len(imagine)))
-    # print([i for i, v in enumerate(imagine)])
-    print([i for i, v in enumerate(imagine) if imagine[i] == 1971])
-    print()
-
+    print(imagine.count('Imagine'))
+    print(imagine.index('Imagine'))
+    print([i for i in range(len(imagine)) if imagine[i] == 'Imagine'])
     imagine.reverse()
     print(imagine)
     imagine.reverse()
+    print('John Lennon' in imagine)
+    print('John Lennon' not in imagine)
     print()
-
-    print(len(imagine))
 
 
 def demonstrate_arrays():
@@ -113,12 +90,12 @@ def populate_empty_list():
     using random.seed() and random.randint()
     """
 
-    from random import seed, randint
+    from random import randint, seed
+    seed(23)
     l = []
-    seed(34)
     for i in range(1000):
-        l.append(randint(1, 1001))
-    print(l[23:34])
+        l.append(randint(0, 1000))
+    print(l[34:56])
 
 
 def duplicate_list():
@@ -129,11 +106,11 @@ def duplicate_list():
     - l2 = l1[:]
     """
 
-    imagine = ['Imagine', 1971, True, 'John Lennon']
-    imagine2 = imagine.copy()
-    imagine3 = imagine + []
-    print(imagine == imagine2)
-    print(imagine == imagine3)
+    imagine = ['Imagine', 1971, True]
+    l = imagine
+    print(imagine is l)
+    l = imagine.copy()
+    print(imagine is l)
 
 
 def demonstrate_list_comprehension():
@@ -146,21 +123,20 @@ def demonstrate_list_comprehension():
 
     from array import array
     a = array('i', [1, 2, 3, 4])
-    l = [i for i in a]
-    print(type(l))
-    print(l)
-    print()
-
-    imagine = ['Imagine', '1971', 'John Lennon']
-    print(', '.join(s for s in imagine))
+    print([i for i in a])
+    print([i for i in a if i % 2])
     print()
 
     songs = ['Imagine a Man', 'There\'s a Place', 'No Expectations', 'Heaven Knows']
-    fw = [words[0] for words in [title.split() for title in songs]]
-    # fw = [title.split()[0] for title in songs]                        # simpler (preferable)
+    print([song for song in songs if 'a ' in song])
+    fw = [title.split()[0] for title in songs]
     print(fw)
-    # fw = [fw[0]] + [word for word in fw[1:]]
-    print(' '.join([fw[0]] + [word.lower() for word in fw[1:]]))
+    fw = fw[0].capitalize() + ' ' + ' '.join([item.lower() for item in fw[1:]])
+    print(fw)
+    print()
+
+    imagine = ['Imagine', 'John Lennon', 1971, 'Imagine', 'Imagine']
+    print([i for i, v in enumerate(imagine) if imagine[i] == 'Imagine'])
 
 
 if __name__ == '__main__':

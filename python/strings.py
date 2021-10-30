@@ -17,19 +17,25 @@ def demonstrate_formatting():
     - str() vs. repr() (usually the same, but with whitespace there is a difference)
     """
 
-    print('%7.7f, %d, %s' % (2.3, 3, 'Imagine'))
-    print('c:\nowhere man')
-    print(r'c:\nowhere man')
-    print(
-"""He's a real nowhere man
-Sitting in his nowhere land
-Making all his nowhere plans 
-for nobody""")
-    print('nowhere          ' * 3)
-    print('nowhere'[:])
-    print('nowhere'[:3])
-    print('nowhere'[:-3])
-    print('nowhere'[-3:])
+    print('%s was first released in %d. It has been sold in %1.2f million copies %s.' % ('Imagine', 1971, 20.2, 'worldwide'))
+    print()
+
+    print('C:\none')
+    print(r'C:\none')
+    print('      Imagine' * 3)
+    print()
+
+    print('Imagine'[:3])
+    print('Imagine'[:-3])
+    print('Imagine'[-3:])
+    print('Imagine'[:])
+    print()
+
+    print(str('Imagine   '))
+    print(repr('Imagine   '))
+    print(repr('Imagine   \t'))
+    print(repr('Imagine   ' + '\t'))
+    print()
 
 
 def demonstrate_fancy_formatting():
@@ -37,11 +43,8 @@ def demonstrate_fancy_formatting():
     - format strings like '{0}{1} {2}', '{0}{1} {2}, {3}', etc.
     """
 
-    song = 'Imagine'
-    author = 'John Lennon'
-    year = 1971
-    # print('{}, a song by {} ({})'.format('Imagine', 'John Lennon', 1971))
-    print('{}, a song by {} ({})'.format(song, author, year))
+    print('{} was first released in {}. It is a song written and performed by {}.'.format('Imagine', 1971, 'John Lennon'))
+    print()
 
 
 def demonstrate_fancy_formatting_with_f_strings():
@@ -51,43 +54,32 @@ def demonstrate_fancy_formatting_with_f_strings():
 
     song = 'Imagine'
     author = 'John Lennon'
-    year = 1971
-    print(f'{song}, a song by {author} ({year})')
+    print(f'{song} was first released in {1971}. It is a song written and performed by {author}.')
+    print()
 
 
 def demonstrate_string_operations():
     """Using different string operations.
-    - endswith(), split(), center(), in (aka contains()), == (aka equals(), len(),...), strip() (lstrip(), rstrip())
+    - endswith(), split(), center(), in (aka contains()), == (aka equals()), len(), ..., strip() (lstrip(), rstrip())
     """
 
-    imagine = 'Imagine, a song by John Lennon.'
+    imagine = 'Imagine was first released in 1971. It is a song written and performed by John Lennon.'
 
-    print(imagine.startswith('Imagine'))
-    print(imagine.startswith('imagine'))
-    print(imagine.endswith('imagine'))
-    print(imagine.endswith('.'))
-    print()
-
-    print('Imagine'.center(30, '*'))
-    # print('Imagine'.center(5, '*'))
-    print('Imagine' in imagine)
-    print('Imagine' == imagine)
-    print(len(imagine))
-    print()
-
+    print(imagine.endswith('Lennon.'))
     print(imagine.split())
-    # import re
-    # l = re.split('[ ,]', imagine)
-    # l.remove('')
-    # print(l)
-    print(imagine.split(', '))
-    print(imagine.rsplit('.'))
+    print(imagine.split('Imagine was '))
+    print('Imagine'.center(30, '*'))
+    print('mag' in 'Imagine')
+    print('Imagine' == 'Imagine')
+    print(len('Imagine'))
+    print('  Imagine     ')
+    print('  Imagine     '.lstrip())
     print()
 
 
 if __name__ == '__main__':
 
-    # demonstrate_formatting()
-    # demonstrate_fancy_formatting()
-    # demonstrate_fancy_formatting_with_f_strings()
+    demonstrate_formatting()
+    demonstrate_fancy_formatting()
+    demonstrate_fancy_formatting_with_f_strings()
     demonstrate_string_operations()

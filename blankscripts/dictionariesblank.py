@@ -17,6 +17,7 @@ def demonstrate_dictionaries():
     """Creating and using dictionaries.
     - create a blank (empty) dictionary
     - create a non-empty dictionary
+    - access dictionary values by the corresponding keys (syntax: value = d[key])
     - print a non-empty dictionary
         - print all items using the items() function
         - print one item per line

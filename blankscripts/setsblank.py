@@ -1,4 +1,4 @@
-"""Demonstrates sets
+"""Demonstrates sets.
 """
 
 
