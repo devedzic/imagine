@@ -12,34 +12,37 @@ def demonstrate_tuples():
     empty_tuple = ()
     print(type(empty_tuple))
     print(empty_tuple)
-    one_tuple = ('Imagine', )
-    print(type(one_tuple))
+    one_tuple = (1,)
     print(one_tuple)
-    # two_tuple = ('Imagine', 'John Lennon')
-    two_tuple = 'Imagine', 'John Lennon'
-    print(type(two_tuple))
-    print(two_tuple)
-    three_tuple = 'Imagine', 'John Lennon', 1971
-    print(three_tuple)
+    pair = (1, 4, )
+    print(pair)
+    triplet = (1, 2, 6, )
+    print(triplet)
+    n_tuple = (True, 'Imagine', 1971)
+    print(n_tuple)
+    print(n_tuple[1])
     print()
-
-    print(three_tuple[1])
-    # three_tuple[1] = 'JL'
+    for i in n_tuple:
+        print(i)
+    # n_tuple[1] = '...'
+    print()
 
 
 def demonstrate_packing():
     """Packing and unpacking tuples.
     """
 
-    two_tuple = 'Imagine', 'John Lennon'
-    imagine, john = two_tuple
-    print(two_tuple)
-    print(imagine, john)
+    imagine = 'Imagine', 'John Lennon', 1971,
+    i, j, year = imagine
+    print({i, j, year})
     print()
 
 
 def demonstrate_zip():
     """Using the built-in zip() function with tuples and multi-counter for-loop.
+    - demonstrate zip object
+    - demonstrate converting a zip object to a list object
+    - demonstrate that a zip object is an iterator (must be re-initialized after looping)
     """
 
     john = ('John Lennon', 1940, 'Liverpool')
@@ -47,19 +50,15 @@ def demonstrate_zip():
     george = ('George Harrison', 1944, 'Liverpool')
     ringo = ('Ringo Starr', 1940, 'Liverpool')
 
-    theBeatles = zip(john, paul, george, ringo)
+    theBeatles = zip(john, paul, george, ringo, )
     print(theBeatles)
-    print(list(theBeatles))
-    print()
+    print(tuple(theBeatles))
 
-    theBeatles = zip(john, paul, george, ringo)                         # it is essential to re-create the zip object;
-    for i, j, k, l in theBeatles:                                       # otherwise, this second loop prints nothing,
-        print(str(i) + ';', str(j) + ';', str(k) + ';', str(l))         # (zip iterator exhausted in print(list(...)))
     print()
 
 
 if __name__ == '__main__':
 
-    # demonstrate_tuples()
-    # demonstrate_packing()
+    demonstrate_tuples()
+    demonstrate_packing()
     demonstrate_zip()

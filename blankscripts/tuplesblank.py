@@ -21,6 +21,9 @@ def demonstrate_packing():
 
 def demonstrate_zip():
     """Using the built-in zip() function with tuples and multi-counter for-loop.
+    - demonstrate zip object
+    - demonstrate converting a zip object to a list object
+    - demonstrate that a zip object is an iterator (must be re-initialized after looping)
     """
 
     john = ('John Lennon', 1940, 'Liverpool')

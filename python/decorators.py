@@ -25,6 +25,14 @@ def pass_simple_function_as_parameter():
 
     # Case 1: 0 or more arguments
 
+    def f(*args):
+        return sum(args)
+
+    def g(f, *args):
+        return f(*args)
+
+    print(g(f, *(1, 2, 3)))
+
     # Try also this in Python Console:
     #     def f(*args):
     #         return sum(args)      # it must be sum(args), not sum(*args); e.g. in Python Console sum((1, 2)) is OK
@@ -34,6 +42,17 @@ def pass_simple_function_as_parameter():
     #     g(f, *[1, 2, 3])          # result: 6
 
     # Case 2: 1 or more arguments (the first one is positional)
+
+    def song(title, *args):
+        print(title)
+        print(', '.join([str(arg) for arg in args]))
+
+    def play_song(f, title, *args):
+        f(title, *args)
+
+    play_song(song, 'Imagine', 'John Lennon', 1971)
+    play_song(song, 'Imagine')
+    # play_song(song)           # No! There MUST be one positional arg, because song() is defined that way!
 
 
 def pass_function_as_parameter(f, *args, **kwargs):
@@ -66,6 +85,8 @@ def pass_function_as_parameter(f, *args, **kwargs):
     See https://stackoverflow.com/a/34206138/1899061 for further details.
     """
 
+    f(*args, **kwargs)
+
 
 def return_function(full_name, first_name_flag):
     """Demonstrates using a function as the return value from another function.
@@ -73,6 +94,19 @@ def return_function(full_name, first_name_flag):
     - a function that returns a person's first name
     - a function that returns a person's family name
     """
+
+    f, l = full_name.split()
+
+    def first():
+        return f
+
+    def last():
+        return l
+
+    if first_name_flag:
+        return first
+    else:
+        return last
 
 
 def return_function_with_args(*args):
@@ -82,6 +116,17 @@ def return_function_with_args(*args):
     - a function that returns an empty list
     - a function that returns a tuple of args (or a list or args, or...)
     """
+
+    def f(*parameters):
+        return []
+
+    def g(*parameters):
+        return parameters
+
+    if args:
+        return g
+    else:
+        return f
 
 
 def a_very_simple_decorator(f):
@@ -131,6 +176,14 @@ def a_very_simple_decorator(f):
     # John Lennon
     # John Lennon
 
+    def wrap(*args):
+        print('Before')
+        v = f(*args)
+        print('After')
+        return v
+
+    return wrap
+
 
 def members(f_to_decorate):
     """Demonstrates how to develop a decorator.
@@ -146,6 +199,16 @@ def members(f_to_decorate):
         return wrapper_decorator
     """
 
+    @functools.wraps(f_to_decorate)
+    def members_decorator(*args, **kwargs):
+        print('Band: ', end='')
+        v = f_to_decorate(*args, **kwargs)
+        print(', '.join([member for member in args[1:]]))
+        print(', '.join([str(k) + ": " + str(v) for k, v in kwargs.items()]))
+        return v
+
+    return members_decorator
+
 
 @members
 def print_band(name, *members, **years_active):
@@ -159,16 +222,42 @@ def print_band(name, *members, **years_active):
 
 if __name__ == '__main__':
 
-    pass_simple_function_as_parameter()
+    # pass_simple_function_as_parameter()
 
-    # from python.functions import *
-    #
-    # john = 'John Lennon'
-    # paul = 'Paul McCartney'
-    # george = 'George Harrison'
-    # ringo = 'Ringo Starr'
-    # the_beatles = [john, paul, george, ringo]
-    #
+    from python.functions import *
+
+    john = 'John Lennon'
+    paul = 'Paul McCartney'
+    george = 'George Harrison'
+    ringo = 'Ringo Starr'
+    the_beatles = [john, paul, george, ringo]
+
     # pass_function_as_parameter(use_all_categories_of_args, 'The Beatles', *the_beatles, start=1962, end=1970)
+    # pass_function_as_parameter(use_all_categories_of_args, 'The Beatles', start=1962, end=1970)
 
+    # f = return_function('John Lennon', 0)
+    # print(f)
+    # print(f())
 
+    # f = return_function_with_args(0)
+    # # f = return_function_with_args(876)
+    # print(f)
+    # print(f('John Lennon', 0))
+
+    # @a_very_simple_decorator
+    # def imagine(*args):
+    #     print(args)
+    #
+    # imagine(*['Imagine', 'John Lennon', 'Klaus Voormann'])
+    # print()
+    #
+    # # f = a_very_simple_decorator(imagine)
+    # # f('Imagine', 'John Lennon', 'Klaus Voormann')
+    # # print()
+    #
+    # # imagine = a_very_simple_decorator(imagine)
+    # # imagine(*['Imagine', 'John Lennon', 'Klaus Voormann'])
+    # print(imagine.__name__)
+    print()
+
+    print_band('The Beatles', *the_beatles, start=1962, end=1970)

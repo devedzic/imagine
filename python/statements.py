@@ -10,22 +10,25 @@ def demonstrate_branching():
     - there can be more than one elif after if (no switch statement, use multiple elif instead)
     """
 
-    i1 = 'Imagine'
-    i2 = 'Imagine'
-    print(id(i1) == id(i2))
+    imagine = ['Imagine', 1971]
+
+    if imagine == ['Imagine', 1971]:
+        print(True)
+    if imagine is ['Imagine', 1971]:
+        print(True)
+    else:
+        print(False)
+    if imagine:
+        print(True)
     print()
 
-    i1 = ['Imagine']
-    i2 = ['Imagine']
-    print(id(i1) == id(i2))
-    print()
-
-    if 'II' in 'Imagine':
-        print('II')
-    elif 'y' in 'Imagine':
-        print('y')
-    elif 'x' in 'Imagine':
-        print('x')
+    n = 4
+    if n == 1:
+        print(1)
+    elif n == 2:
+        print(2)
+    elif n == 3:
+        print(3)
     else:
         print(None)
 
@@ -39,25 +42,23 @@ def demonstrate_loops():
     - while loop
     """
 
-    for i in range(1, 21, 2):
-        print(i, end=' ')
+    l = [1, 2, 3, 4, 5, 6, 7]
+    for i in l[2:-3]:
+        print(i)
     print()
-
-    for c in 'Imagine'[3:]:
-        print(c, end=' ')
+    for i in range(1, 12, 2):
+        print(i)
     print()
-
-    i = 0
-    while i < 20:
-        print(i, end= ' ')
-        i += 1
-    print()
-
-    for _ in range(1, 5):
+    for _ in range(1, 12, 2):
         print('Imagine')
+    print()
+    i = 0
+    while i < 10:
+        print(i)
+        i += 1
 
 
 if __name__ == '__main__':
 
-    # demonstrate_branching()
+    demonstrate_branching()
     demonstrate_loops()

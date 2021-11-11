@@ -12,35 +12,31 @@ def demonstrate_sets():
         ^ (disjoint)
     """
 
-    # imagine = {}            # No, it's an empty dict, not an empty set!
-    # print(type(imagine))
+    # imagine =
     imagine = set()
-    print(imagine)
+    imagine.add('Imagine')
     print(type(imagine))
+    print(imagine)
+    imagine.update(['John Lennon', 1971])
+    print(imagine)
+    print()
+
+    l = ['Imagine', 'John Lennon', 1971, 'Imagine']
+    l = ('Imagine', 'John Lennon', 1971, 'Imagine')
+    print(l)
+    print(set(l))
+    print(list(set(l)))
+    print(tuple(set(l)))
+    print()
+
     imagine.add('Imagine')
     print(imagine)
     print()
 
-    theBeatles = {'John', 'Paul', 'George', 'Ringo'}
-    print(type(theBeatles))
-    print(theBeatles)
-    print(id(theBeatles))
-    theBeatles.add('Brian')
-    print(theBeatles)
-    print(id(theBeatles))
-    imagine.add('George')
-    print(theBeatles)          # No duplicates
-    print()
-
-    for m in theBeatles:
-        print(m)
-    print()
-
-    print(theBeatles - {'Brian'})
-    print(theBeatles & {'Brian', 'Paul'})
-    print(theBeatles)
-    print(theBeatles | {'Stewart', 'Pete'})
-    print(theBeatles ^ {'Stewart'})
+    print(imagine | set(('Alan White', 'Klaus Voormann')))
+    print(imagine & {'Imagine', 1971})
+    print(imagine - {1971})
+    print(imagine ^ {1971, 'Imagine'})
 
 
 if __name__ == '__main__':

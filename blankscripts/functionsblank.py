@@ -2,7 +2,7 @@
 """
 
 
-def demonstrate_annotations(song, year):
+def demonstrate_annotations(title, year):
     """Demonstrates how to use annotations of
     function parameters/arguments (<arg>: <type>) and of function return type (def f(...) -> <type>:).
     - print the function parameters/arguments
@@ -21,7 +21,7 @@ def show_song(title, author='John Lennon', year=1971):
     """
 
 
-def use_flexible_arg_list(band_name: str, *members):
+def use_flexible_arg_list(band: str, *members):
     """Demonstrates flexible number of arguments/parameters.
     - print the band name and the list of band members in one line
     """
