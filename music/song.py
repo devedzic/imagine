@@ -3,6 +3,7 @@
 
 
 # from util import utility
+from music.enums import *
 import json
 
 
@@ -82,8 +83,7 @@ class Song:
         """
 
         # return self.title + ' (unplugged)' if self.is_unplugged else self.title
-        t = song_string.rstrip('(unplugged)')
-        t = t.strip()
+        t = song_string.split(' (unplugged)')[0]
         u = True if '(unplugged)' in song_string else False
         return cls(t, u)
 
@@ -111,25 +111,48 @@ def song_json_to_py(song_json):
     """
 
 
-class Ballade(Song):
-    """The class describing the concept of ballade.
+class Ballad(Song):
+    """The class describing the concept of ballad.
     It is assumed that a ballade is sufficiently described as a Song,
-    with the addition of whether it is a piano ballade or a guitar ballade.
+    with the addition of whether its tempo is slow or moderate.
 
     Useful link (related to inheritance in Python):
     https://stackoverflow.com/questions/3394835/use-of-args-and-kwargs/3394902#3394902 (calling super() in constructors)
     """
 
-    # Version 1 - no multiple inheritance
+    # # Version 1 - no multiple inheritance
+    #
+    # def __init__(self, title, tempo: Tempo, is_unplugged=False):
+    #     super().__init__(title, is_unplugged)
+    #     # self.tempo = tempo if isinstance(tempo, Tempo) else 'unknown'
+    #     self.tempo = tempo
 
     # Version 2 - with multiple inheritance
 
+    def __init__(self, tempo: Tempo, **kwargs):
+        super().__init__(**kwargs)
+        self.tempo = tempo
+
+    def __str__(self):
+        return super().__str__() + f'; {self.tempo.name.lower()}'
+
+    def __eq__(self, other):
+        # Recommended if inheritance is involved
+        # (https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes):
+        # if type(other) is type(self):
+        #     return self.__dict__ == other.__dict__
+        # return False
+
+        return self.__dict__ == other.__dict__ if type(other) is type(self) else False
+
     def play(self, artist, *args, **kwargs):
-        """Overrides the play() method from superclass.
-        Assumes that artist, *args (expressions of gratitude) and kwargs.values() (messages) are strings.
-        Prints artist, expressions of gratitude and messages. A call example:
-            <ballade>.play(artist, *['Thank you!', 'You're wonderful!], love='We love you!')
+        """Assumes that artist, *args (e.g. expressions of gratitude) and kwargs.values() (e.g. messages) are strings.
+        Prints song title, artist, and things like rhythm counts, expressions of gratitude and messages. A call example:
+            <song>.play(artist, *['Thank you!', 'You're wonderful!], love='We love you!')
         """
+
+        print('Ballad')
+        super().play(artist, *args, **kwargs)
 
 
 class PianoSong(Song):
@@ -138,16 +161,41 @@ class PianoSong(Song):
     in which the dominating instrument is piano.
     """
 
-    # Version 1 - no multiple inheritance
+    # # Version 1 - no multiple inheritance
+    #
+    # def __init__(self, title, is_unplugged=False, instrument: Instrument = Instrument.PIANO):
+    #     super().__init__(title, is_unplugged)
+    #     self.instrument = instrument
 
     # Version 2 - with multiple inheritance
 
-    def what_do_you_do(self):
-        """Just a simple method to describe the concept of piano song.
+    def __init__(self, instrument: Instrument = Instrument.PIANO, **kwargs):
+        super().__init__(**kwargs)
+        self.instrument = instrument
+
+    def __str__(self):
+        return super().__str__() + '; piano song'
+
+    def __eq__(self, other):
+        # Recommended if inheritance is involved
+        # (https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes):
+        # if type(other) is type(self):
+        #     return self.__dict__ == other.__dict__
+        # return False
+
+        return self.__dict__ == other.__dict__ if type(self) is type(other) else False
+
+    def details(self):
+        """Just a simple method to indicate details of a piano song.
         """
 
+        print(f'{self.title}')
+        print('piano-dominated song')
+        print('unplugged') if self.is_unplugged else print('amplified')
 
-class PianoBallade(Ballade, PianoSong):
+
+class PianoBallad(Ballad, PianoSong):
+# class PianoBallad(PianoSong, Ballad, ):
     """The class describing the concept of piano ballade.
     It is assumed that a piano ballade is sufficiently described as a song that is simultaneously piano-dominated.
 
@@ -155,6 +203,21 @@ class PianoBallade(Ballade, PianoSong):
     https://stackoverflow.com/a/50465583/1899061 (designing classes (i.e. their __init__() methods) for multiple inh.)
     https://stackoverflow.com/a/533675/1899061 (mixins explained, and what good they are in multiple inheritance)
     """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __str__(self):
+        return super().__str__()
+
+    def __eq__(self, other):
+        # Recommended if inheritance is involved
+        # (https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes):
+        # if type(other) is type(self):
+        #     return self.__dict__ == other.__dict__
+        # return False
+
+        return self.__dict__ == other.__dict__ if type(self) is type(other) else False
 
 
 if __name__ == "__main__":
@@ -220,18 +283,39 @@ if __name__ == "__main__":
     print()
 
     # Demonstrate inheritance
-    # object class (like the Object class in Java; all classes inherit from object
-    #   try, e.g., list.__mro__ in the console)
+    # object class
+    #   it's like the Object class in Java
+    #   all classes inherit from object - try, e.g., list.__mro__ in the console
     #   object class defines object.__eq__(self, other) etc.
     #   object.__ne__(self, other), the inverse of object.__eq__(self, other),
     #   is provided by Python automatically once object.__eq__(self, other) is implemented
+    print(list.__mro__)
+    print()
+    # oh_darling = Ballad('Oh, Darling!', Tempo.MODERATE, )
+    oh_darling = Ballad(title='Oh, Darling!', tempo=Tempo.MODERATE, )
+    print(oh_darling)
+    # print(oh_darling == Ballad('Oh, Darling!', Tempo.MODERATE, is_unplugged=True))
+    print(oh_darling == Ballad(title='Oh, Darling!', tempo=Tempo.MODERATE, is_unplugged=True))
+    print()
+    # let_it_be = PianoSong('Let It Be')
+    let_it_be = PianoSong(title='Let It Be')
+    print(let_it_be)
+    # print(let_it_be == PianoSong('Let It Be'))
+    print(let_it_be == PianoSong(title='Let It Be'))
     print()
 
     # Demonstrate method overriding
+    imagine.play('John Lennon')
+    print()
+    oh_darling.play('Paul McCartney')
     print()
 
     # Demonstrate multiple inheritance and MRO.
     # Make sure to read this first: https://stackoverflow.com/a/50465583/1899061 (especially Scenario 3).
+    love = PianoBallad(title='Love', tempo=Tempo.SLOW, is_unplugged=True)
+    print(love)
+    print(love == PianoBallad(title='Love', tempo=Tempo.SLOW, is_unplugged=True))
+    print(PianoBallad.__mro__)
     print()
 
     # Demonstrate JSON encoding/decoding of simple data types.

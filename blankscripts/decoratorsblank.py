@@ -80,7 +80,7 @@ def return_function_with_args(*args):
     The returned function has parameters/arguments.
     In this example, depending on len(args), return_function_with_args() returns one of the following functions:
     - a function that returns an empty list
-    - a function that returns a tuple of args (or a list or args, or...)
+    - a function that returns a tuple of args (or a list of args, or...)
     """
 
 

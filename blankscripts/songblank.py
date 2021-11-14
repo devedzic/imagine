@@ -3,6 +3,7 @@
 
 
 # from util import utility
+from music.enums import *
 import json
 
 
@@ -49,7 +50,6 @@ class Song:
         Prints song title, artist, and things like rhythm counts, expressions of gratitude and messages. A call example:
             <song>.play(artist, *['Thank you!', 'You're wonderful!], love='We love you!')
         """
-
         pass
 
     def play_song(self, artist, *args, **kwargs):
@@ -89,10 +89,10 @@ def song_json_to_py(song_json):
     """
 
 
-class Ballade(Song):
-    """The class describing the concept of ballade.
-    It is assumed that a ballade is sufficiently described as a Song,
-    with the addition of whether it is a piano ballade or a guitar ballade.
+class Ballad(Song):
+    """The class describing the concept of ballad.
+    It is assumed that a ballad is sufficiently described as a Song,
+    with the addition of whether its tempo is slow or moderate.
 
     Useful link (related to inheritance in Python):
     https://stackoverflow.com/questions/3394835/use-of-args-and-kwargs/3394902#3394902 (calling super() in constructors)
@@ -102,12 +102,24 @@ class Ballade(Song):
 
     # Version 2 - with multiple inheritance
 
+    def __str__(self):
+        pass
+
+    def __eq__(self, other):
+        # Recommended if inheritance is involved
+        # (https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes):
+        # if type(other) is type(self):
+        #     return self.__dict__ == other.__dict__
+        # return False
+
+        pass
+
     def play(self, artist, *args, **kwargs):
-        """Overrides the play() method from superclass.
-        Assumes that artist, *args (expressions of gratitude) and kwargs.values() (messages) are strings.
-        Prints artist, expressions of gratitude and messages. A call example:
-            <ballade>.play(artist, *['Thank you!', 'You're wonderful!], love='We love you!')
+        """Assumes that artist, *args (e.g. expressions of gratitude) and kwargs.values() (e.g. messages) are strings.
+        Prints song title, artist, and things like rhythm counts, expressions of gratitude and messages. A call example:
+            <song>.play(artist, *['Thank you!', 'You're wonderful!], love='We love you!')
         """
+        pass
 
 
 class PianoSong(Song):
@@ -120,19 +132,43 @@ class PianoSong(Song):
 
     # Version 2 - with multiple inheritance
 
-    def what_do_you_do(self):
-        """Just a simple method to describe the concept of piano song.
+    def __str__(self):
+        pass
+
+    def __eq__(self, other):
+        # Recommended if inheritance is involved
+        # (https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes):
+        # if type(other) is type(self):
+        #     return self.__dict__ == other.__dict__
+        # return False
+
+        pass
+
+    def details(self):
+        """Just a simple method to indicate details of a piano song.
         """
 
 
-class PianoBallade(Ballade, PianoSong):
-    """The class describing the concept of piano ballade.
-    It is assumed that a piano ballade is sufficiently described as a song that is simultaneously piano-dominated.
+class PianoBallad(Ballad, PianoSong):
+    """The class describing the concept of piano ballad.
+    It is assumed that a piano ballad is sufficiently described as a song that is simultaneously piano-dominated.
 
     Useful links :
     https://stackoverflow.com/a/50465583/1899061 (designing classes (i.e. their __init__() methods) for multiple inh.)
     https://stackoverflow.com/a/533675/1899061 (mixins explained, and what good they are in multiple inheritance)
     """
+
+    def __str__(self):
+        pass
+
+    def __eq__(self, other):
+        # Recommended if inheritance is involved
+        # (https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes):
+        # if type(other) is type(self):
+        #     return self.__dict__ == other.__dict__
+        # return False
+
+        pass
 
 
 if __name__ == "__main__":
@@ -173,8 +209,9 @@ if __name__ == "__main__":
     print()
 
     # Demonstrate inheritance
-    # object class (like the Object class in Java; all classes inherit from object
-    #   try, e.g., list.__mro__ in the console)
+    # object class
+    #   it's like the Object class in Java
+    #   all classes inherit from object - try, e.g., list.__mro__ in the console
     #   object class defines object.__eq__(self, other) etc.
     #   object.__ne__(self, other), the inverse of object.__eq__(self, other),
     #   is provided by Python automatically once object.__eq__(self, other) is implemented

@@ -15,7 +15,7 @@ import json
 
 class Studio:
     """The class describing the concept of a music/recording studio.
-    It includes the studio name, a list of Band objects (bands recording in that studio over a certain period of time),
+    It includes the studio name, a list of Playlist objects (bands recording in that studio over a certain period of time),
     location and the start and end dates for the scheduled recording sessions.
     """
 
@@ -89,9 +89,9 @@ if __name__ == "__main__":
     print()
 
     # Demonstrate exceptions - user-defined exceptions (wrong recording date(s), wrong band start date)
-    # the_beatles = Band('The Beatles', *[johnLennon, paulMcCartney, georgeHarrison, ringoStarr],
+    # the_beatles = Playlist('The Beatles', *[johnLennon, paulMcCartney, georgeHarrison, ringoStarr],
     #                    formed=date(1962, 8, 18), split=date(1970, 4, 10))
-    # pink_floyd = Band('Pink Floyd', rogerWaters, nickMason, rickWright, davidGilmour,
+    # pink_floyd = Playlist('Pink Floyd', rogerWaters, nickMason, rickWright, davidGilmour,
     #                   formed=date(1965, 2, 12), split=date(1995, 3, 14))
 
     # Create a Studio object

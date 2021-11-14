@@ -25,14 +25,6 @@ def pass_simple_function_as_parameter():
 
     # Case 1: 0 or more arguments
 
-    def f(*args):
-        return sum(args)
-
-    def g(f, *args):
-        return f(*args)
-
-    print(g(f, *(1, 2, 3)))
-
     # Try also this in Python Console:
     #     def f(*args):
     #         return sum(args)      # it must be sum(args), not sum(*args); e.g. in Python Console sum((1, 2)) is OK
@@ -41,18 +33,26 @@ def pass_simple_function_as_parameter():
     #     g(f, *(1, 2, 3))          # result: 6
     #     g(f, *[1, 2, 3])          # result: 6
 
+    def f(*args):
+        return sum(args)
+
+    def g(f, *args):
+        return f(*args)
+
+    print(g(f, *[1, 2, 3]))
+    print(g(f, *(1, 2, 3)))
+    print()
+
     # Case 2: 1 or more arguments (the first one is positional)
 
-    def song(title, *args):
-        print(title)
-        print(', '.join([str(arg) for arg in args]))
+    def f(title, *args):
+        print(f'{title} ({", ".join([str(arg) for arg in args])})')
 
-    def play_song(f, title, *args):
-        f(title, *args)
+    def g(f, *args):
+        f(args[0], *args[1:])
 
-    play_song(song, 'Imagine', 'John Lennon', 1971)
-    play_song(song, 'Imagine')
-    # play_song(song)           # No! There MUST be one positional arg, because song() is defined that way!
+    g(f, 'Imagine', 'John Lennon', 1971)
+    # g(f, )                                    # No! There must be 1 positional arg!
 
 
 def pass_function_as_parameter(f, *args, **kwargs):
@@ -103,10 +103,7 @@ def return_function(full_name, first_name_flag):
     def last():
         return l
 
-    if first_name_flag:
-        return first
-    else:
-        return last
+    return first if first_name_flag else last
 
 
 def return_function_with_args(*args):
@@ -114,19 +111,16 @@ def return_function_with_args(*args):
     The returned function has parameters/arguments.
     In this example, depending on len(args), return_function_with_args() returns one of the following functions:
     - a function that returns an empty list
-    - a function that returns a tuple of args (or a list or args, or...)
+    - a function that returns a tuple of args (or a list of args, or...)
     """
 
-    def f(*parameters):
+    def empty(*parameters):
         return []
 
-    def g(*parameters):
+    def non_empty(*parameters):
         return parameters
 
-    if args:
-        return g
-    else:
-        return f
+    return empty if not args else non_empty
 
 
 def a_very_simple_decorator(f):
@@ -176,9 +170,9 @@ def a_very_simple_decorator(f):
     # John Lennon
     # John Lennon
 
-    def wrap(*args):
+    def wrap(*p):
         print('Before')
-        v = f(*args)
+        v = f(*p)
         print('After')
         return v
 
@@ -200,14 +194,16 @@ def members(f_to_decorate):
     """
 
     @functools.wraps(f_to_decorate)
-    def members_decorator(*args, **kwargs):
-        print('Band: ', end='')
+    def wrap(*args, **kwargs):
+        print('Playlist: ', end='')
         v = f_to_decorate(*args, **kwargs)
-        print(', '.join([member for member in args[1:]]))
-        print(', '.join([str(k) + ": " + str(v) for k, v in kwargs.items()]))
+        if args:
+            print(', '.join([str(arg) for arg in args[1:]]))
+        if kwargs:
+            print(', '.join([str(k) + ': ' + str(v) for k, v in kwargs.items()]))
         return v
 
-    return members_decorator
+    return wrap
 
 
 @members
@@ -232,32 +228,29 @@ if __name__ == '__main__':
     ringo = 'Ringo Starr'
     the_beatles = [john, paul, george, ringo]
 
-    # pass_function_as_parameter(use_all_categories_of_args, 'The Beatles', *the_beatles, start=1962, end=1970)
-    # pass_function_as_parameter(use_all_categories_of_args, 'The Beatles', start=1962, end=1970)
+    pass_function_as_parameter(use_all_categories_of_args, 'The Beatles', *the_beatles, start=1962, end=1970)
+    pass_function_as_parameter(use_all_categories_of_args, 'The Beatles', end=1970)
 
-    # f = return_function('John Lennon', 0)
-    # print(f)
+    # f = return_function('John Lennon', [])
     # print(f())
 
-    # f = return_function_with_args(0)
-    # # f = return_function_with_args(876)
-    # print(f)
-    # print(f('John Lennon', 0))
+    # # f = return_function_with_args('John Lennon', 'Imagine', 1971)
+    # f = return_function_with_args('John Lennon')
+    # print(f('John Lennon', 'Imagine', 1971))
+    # f = return_function_with_args()
+    # print(f('John Lennon', 'Imagine', 1971))
 
-    # @a_very_simple_decorator
-    # def imagine(*args):
-    #     print(args)
-    #
-    # imagine(*['Imagine', 'John Lennon', 'Klaus Voormann'])
+    @a_very_simple_decorator
+    def imagine(*args):
+        print(', '.join([str(arg) for arg in args]))
+
+    # # f = a_very_simple_decorator(imagine)
+    # # f('Imagine', 1971)
+    # imagine = a_very_simple_decorator(imagine)
+    # imagine('Imagine', 1971)
+
+    # imagine('Imagine', 1971)
     # print()
     #
-    # # f = a_very_simple_decorator(imagine)
-    # # f('Imagine', 'John Lennon', 'Klaus Voormann')
-    # # print()
-    #
-    # # imagine = a_very_simple_decorator(imagine)
-    # # imagine(*['Imagine', 'John Lennon', 'Klaus Voormann'])
-    # print(imagine.__name__)
-    print()
+    # print_band('The Beatles', *the_beatles, start=1962, end=1970)
 
-    print_band('The Beatles', *the_beatles, start=1962, end=1970)

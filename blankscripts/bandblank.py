@@ -84,7 +84,7 @@ def next_member(band):
 
 
 class BandEncoder(json.JSONEncoder):
-    """JSON encoder for Band objects (cls= parameter in json.dumps()).
+    """JSON encoder for Playlist objects (cls= parameter in json.dumps()).
     """
 
     def default(self, band):
@@ -94,12 +94,12 @@ class BandEncoder(json.JSONEncoder):
 
 
 def musician_py_to_json(band):
-    """JSON encoder for Band objects (default= parameter in json.dumps()).
+    """JSON encoder for Playlist objects (default= parameter in json.dumps()).
     """
 
 
 def band_json_to_py(band_json):
-    """JSON decoder for Band objects (object_hook= parameter in json.loads()).
+    """JSON decoder for Playlist objects (object_hook= parameter in json.loads()).
     """
 
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     # Demonstrate generator expressions
     print()
 
-    # Demonstrate JSON encoding/decoding of Band objects
+    # Demonstrate JSON encoding/decoding of Playlist objects
     # Single object
     print()
 
