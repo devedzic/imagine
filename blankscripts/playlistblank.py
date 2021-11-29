@@ -67,6 +67,18 @@ def next_song(playlist):
     """
 
 
+class PlaylistError(Exception):
+    """Base class for exceptions in this module.
+    """
+
+    pass
+
+
+class PlaylistDateError(PlaylistError):
+    """Exception raised when the date when a playlist was created is after the date when the playlist was completed.
+    """
+
+
 class PlaylistEncoder(json.JSONEncoder):
     """JSON encoder for Playlist objects (cls= parameter in json.dumps()).
     """
@@ -115,6 +127,27 @@ if __name__ == "__main__":
     print()
 
     # Demonstrate generator expressions
+    print()
+
+    # Demonstrate exceptions
+    # Here's the hierarchy of built-in exceptions: https://docs.python.org/3/library/exceptions.html#exception-hierarchy
+
+    # Demonstrate exceptions - the general structure of try-except statements, possibly including else and finally
+    print()
+
+    # Demonstrate exceptions - except: Exception as <e> (and then type(<e>), <e>.__class__.__name__, <e>.args,...)
+    print()
+
+    # Demonstrate writing to a text file - <outfile>.write(), <outfile>.writelines()
+    print()
+
+    # Demonstrate reading from a text file - <infile>.read(), <infile>.readline()
+    print()
+
+    # Demonstrate writing to a binary file - pickle.dump()
+    print()
+
+    # Demonstrate reading from a binary file - pickle.load()
     print()
 
     # Demonstrate JSON encoding/decoding of Playlist objects

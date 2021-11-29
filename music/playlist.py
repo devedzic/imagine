@@ -3,11 +3,16 @@ It includes a list of Song objects and the dates when the playlist was created a
 """
 
 from datetime import date, datetime, time
+from pathlib import Path
+import sys
+from pickle import *
 import json
 
-from music.song import Song
-from util.utility import format_date
-from settings import PREFERRED_DATE_FORMAT
+from music.song import Song, song_py_to_json, song_json_to_py
+# from util.utility import format_date
+# from settings import PREFERRED_DATE_FORMAT
+from settings import *
+from util.utility import *
 
 
 class Playlist:
@@ -21,25 +26,23 @@ class Playlist:
     play_me = 'Play me :)'
 
     def __init__(self, name, *songs, created=date.today(), completed=date.today()):
-        self.name = name if isinstance(name, str) else 'unknown'
+        if created > completed:
+            raise PlaylistDateError(created, completed)
+        self.name = name
         self.songs = songs
-        # self.songs = songs if all([isinstance(song, Song) for song in songs]) else None
-        self.created = created if isinstance(created, date) else None
-        self.completed = completed if isinstance(completed, date) else None
-        # self.__i = 0
+        self.created = created
+        self.completed = completed
+        # pass                                            # introduce and initialize iterator counter, self.__i
 
     def __str__(self):
-        name = self.name.capitalize() + ' playlist:\n'
-        songs = f'{"; ".join([str(song) for song in self.songs])}' + '\n' if self.songs else ''
-        from_to = f'{format_date(self.created)} - {format_date(self.completed)}'
-        return name + songs + from_to
+        n = self.name
+        s = '; '.join([str(song) for song in self.songs]) if self.songs else '(empty)'
+        from_to = date.strftime(self.created, PREFERRED_DATE_FORMAT) + ' - ' + \
+                  date.strftime(self.completed, PREFERRED_DATE_FORMAT)
+        return '\n'.join([n, s, from_to])
 
     def __eq__(self, other):
-        isi = isinstance(other, Playlist)
-        n = self.name == other.name
-        s = (len(self.songs) == len(other.songs)) and all([s in other.songs for s in self.songs])
-        from_to = (self.created == other.created) and (self.completed == other.completed)
-        return isi and n and s and from_to
+        return self.__dict__ == other.__dict__ if type(self) is type(other) else False
 
     @staticmethod
     def is_date_valid(d):
@@ -54,22 +57,10 @@ class Playlist:
         """Splits a playlist string into its typical segments.
         """
 
-        lines = playlist_str.split('\n') if isinstance(playlist_str, str) else []
-        if len(lines) == 3:
-            l1, l2, l3 = lines
-        elif len(lines) == 2:
-            l1, l3 = lines
-            l2 = ''
-        else:
-            l1 = l2 = l3 = ''
-
-        name = songs = created = completed = None
-        if l1 and l3:
-            name = l1.split(' playlist:')[0]
-            created, completed = [datetime.strptime(d, PREFERRED_DATE_FORMAT).date() for d in l3.split(' - ')]
-        if l2:
-            songs = [Song.from_str(song_string) for song_string in l2.split('; ')]
-
+        l1, l2, l3 = playlist_str.split('\n')
+        name = l1
+        songs = [Song.from_str(s) for s in l2.split('; ')] if l2 != '(empty)' else []
+        created, completed = [datetime.strptime(d, PREFERRED_DATE_FORMAT).date() for d in l3.split(' - ')]
         return name, songs, created, completed
 
     # Alternative constructor
@@ -93,9 +84,9 @@ class Playlist:
 
     def __next__(self):
         if self.__i < len(self.songs):
-            next_song = self.songs[self.__i]
+            s = self.songs[self.__i]
             self.__i += 1
-            return next_song
+            return s
         else:
             raise StopIteration
 
@@ -106,10 +97,25 @@ def next_song(playlist):
     A great tutorial on generators: https://realpython.com/introduction-to-python-generators/.
     """
 
-    for song in playlist:
-        input('Next: ')
-        yield song
+    for s in playlist.songs:
+        input('Next:')
+        yield s
         print('Yeah!')
+
+
+class PlaylistError(Exception):
+    """Base class for exceptions in this module.
+    """
+
+    pass
+
+
+class PlaylistDateError(PlaylistError):
+    """Exception raised when the date when a playlist was created is after the date when the playlist was completed.
+    """
+
+    def __init__(self, creation_date, completion_date):
+        self.message = f'playlist creation date ({creation_date}) after playlist completion date ({completion_date}).'
 
 
 class PlaylistEncoder(json.JSONEncoder):
@@ -126,100 +132,203 @@ def playlist_py_to_json(playlist):
     """JSON encoder for Playlist objects (default= parameter in json.dumps()).
     """
 
+    if isinstance(playlist, Playlist):
+        d = playlist.__dict__.copy()
+        d["songs"] = json.dumps(playlist.songs, default=song_py_to_json)
+        d["created"] = date_py_to_json(playlist.created)
+        d["completed"] = date_py_to_json(playlist.completed)
+        return {"__Playlist__": d}
+    return {f"__{playlist.__class__.__name__}__": playlist.__dict__}
+
 
 def playlist_json_to_py(playlist_json):
     """JSON decoder for Playlist objects (object_hook= parameter in json.loads()).
     """
+
+    if "__Playlist__" in playlist_json:
+        d = playlist_json["__Playlist__"]
+        p = Playlist('')
+        p.name = d["name"]
+        p.songs = tuple(json.loads(d["songs"], object_hook=song_json_to_py))
+        p.created = date_json_to_py(d["created"])
+        p.completed = date_json_to_py(d["completed"])
+        return p
+    return playlist_json
 
 
 if __name__ == "__main__":
 
     from testdata.songs import *
 
-    # # Class variables (like static fields in Java; typically defined and initialized before __init__())
-    # print(Playlist.play_me)
-    # print()
+    # Class variables (like static fields in Java; typically defined and initialized before __init__())
+    print(Playlist.play_me)
+    print()
 
     # Check the basic methods (__init__(), __str__(),...)
-    pl = Playlist('My favorite songs', *[imagine, love, across_the_universe, happiness_is_a_warm_gun],
-                  created=date(2021, 11, 12))
+    pl = Playlist('My songs', *[across_the_universe, imagine, happiness_is_a_warm_gun, love],
+                  created=date(2019, 2, 4), completed=date.today())
     print(pl)
-    print(pl == Playlist('My favorite songs', *[imagine, love, across_the_universe, happiness_is_a_warm_gun],
-                         created=date(2021, 11, 12)))
+    print(pl == Playlist('My songs', *[across_the_universe, imagine, happiness_is_a_warm_gun, love],
+                         created=date(2019, 2, 4), completed=date.today()))
+    print()
+    print(Playlist('My songs', created=date(2019, 2, 4), completed=date.today()))
     print()
 
     # Check date validator (@staticmethod is_date_valid(<date>))
-    print(Playlist.is_date_valid(date.today()))
-    print(Playlist.is_date_valid(date(2009, 3, 4)))
+    print(Playlist.is_date_valid(date(2014, 3, 6)))
     print()
 
     # Check the alternative constructor (@classmethod from_playlist_str(<playlist_str>))
-    pl_str = pl.__str__()
-    pl1 = Playlist.from_playlist_str(pl_str)
-    print(pl1)
+    pls = pl.__str__()
+    print(Playlist.from_playlist_str(pls))
+    print(pl == Playlist.from_playlist_str(pls))
     print()
 
     # Check the iterator
-    # iter(pl)
-    # for _ in range(len(pl.songs)):
-    #     print(pl.__next__())
-    # print()
+    i = iter(pl)
+    while True:
+        try:
+            print(next(i))
+        except StopIteration:
+            break
+    print()
 
     # Repeated attempt to run the iterator fails, because the iterator is exhausted
-
-    # iter(pl)                          # without this reinitialization of the iterator, StopError is raised
-    # print(pl.__next__())
-    # for _ in range(len(pl.songs)):
-    #     print(pl.__next__())
-    # print()
-
-    # i = iter(pl)
-    # for _ in range(len(pl.songs)):
-    #     print(next(i))
-    # print()
+    i = iter(pl)
+    print(next(i))
+    print()
 
     # # Demonstrate generators
-    # song_generator = next_song(pl)
+    # next_s = next_song(pl)
     # while True:
     #     try:
-    #         print(next(song_generator))
+    #         print(next(next_s))
     #     except StopIteration:
     #         break
     # print()
-
+    #
     # # Repeated attempt to run the generator fails, because the generator is exhausted
-    # # print(next(song_generator))
-    # song_generator = next_song(pl)
-    # print(next(song_generator))
+    # print()
 
-    # Demonstrate generator expressions
-    # print(i**2 for i in range(3))
-    # print(next(i**2 for i in range(3)))         # 0
-    # print(next(i**2 for i in range(3)))         # 0 again, because the generator is created and initialized again
-    g = (i**2 for i in range(3))
-    print(g)
-    print(next(g))                                # 0
-    print(next(g))                                # 1
-    print(next(g))                                # 4
-    # print(next(g))                              # raises StopIteration, because the generator is exhausted
+    # # Demonstrate generator expressions
+    # e = (i**2 for i in [1, 2, 3])
+    # print(e)
+    # print(next(e))
+    # print(next(e))
+    # print()
+
+    # Demonstrate exceptions
+    # Here's the hierarchy of built-in exceptions: https://docs.python.org/3/library/exceptions.html#exception-hierarchy
+
+    # # Demonstrate exceptions - the general structure of try-except statements, possibly including else and finally
+    # songs = [across_the_universe, imagine, happiness_is_a_warm_gun, love]
+    # try:
+    #     # print(songs[3])
+    #     print(3/0)
+    # except IndexError:
+    #     print('Caught an IndexError!')
+    # except:
+    #     print('Caught an Exception!')
+    # else:
+    #     print('This is printed in the else clause - the try block has completed normally.')
+    # finally:
+    #     print('This is printed in the finally clause, '
+    #           'regardless of whether the try block has completed normally or not.')
+    # print()
+
+    # # Demonstrate exceptions - except: Exception as <e> (and then type(<e>), <e>.__class__.__name__, <e>.args,...)
+    # try:
+    #     print(songs[4])
+    # except Exception as e:
+    #     print('Caught an Exception:', e)
+    #     print('Caught an Exception:', type(e))
+    #     print('Caught an Exception:', e.__class__.__name__)
+    #     print('Caught an Exception:', e.args)
+    # print()
+
+    # # Demonstrate exceptions - user-defined exceptions (wrong playlist date(s))
+    # try:
+    #     pl = Playlist('My songs', *songs, created=date(2012, 4, 6), completed=date.today())
+    #     print(pl)
+    #     # print(3/0)
+    # except PlaylistDateError as e:
+    #     # sys.stderr.write(f'Caught a {e}\n')
+    #     # sys.stderr.write(f'Caught a {e.__class__.__name__}: {e.args[0]}\n')
+    #     # sys.stderr.write(f'Caught a {e.__class__.__name__}: {e.message}\n')
+    #     sys.stderr.write(f'Caught a {e.__class__.__name__}: {e.args[0]}, {e.message}\n')
+    #     raise
+    # except Exception as e:
+    #     sys.stderr.write(f'Caught a {e.__class__.__name__}: {e.args[0]}\n')
+    #     raise
+    # print()
+
+    # # Demonstrate writing to a text file - <outfile>.write(), <outfile>.writelines()
+    # songs = [across_the_universe, imagine, love, happiness_is_a_warm_gun]
+    # file = get_data_dir() / 'songs.txt'
+    # with open(file, 'w') as f:
+    #     # for song in songs:
+    #     #     f.write(str(song) + '\n')
+    #     f.writelines([str(song) + '\n' for song in songs])
+    # print('Text file created.')
+    # print()
+    #
+    # # Demonstrate reading from a text file - <infile>.read(), <infile>.readline()
+    # songs1 = []
+    # with open(file, 'r') as f:
+    #     # # s = f.read()
+    #     # s = f.read().rstrip()
+    #     # print(s)
+    #     # print(type(s))
+    #     # print()
+    #     # songs1 = [Song.from_str(song_str) for song_str in s.split('\n')]
+    #     # print(', '.join([str(s) for s in songs1]))
+    #     while True:
+    #         s = f.readline().rstrip()
+    #         if s:
+    #             songs1.append(Song.from_str(s))
+    #         else:
+    #             break
+    # print(songs1)
+    # print(', '.join([str(s) for s in songs1]))
+    # print()
+
+    # Demonstrate writing to a binary file - pickle.dump()
+    songs = [across_the_universe, imagine, love, happiness_is_a_warm_gun]
+    file = get_data_dir() / 'songs.binary'
+    with open(file, 'wb') as f:
+        dump(songs, f)
+    print('Binary file created.')
     print()
 
+    # Demonstrate reading from a binary file - pickle.load()
+    loaded = []
+    with open (file, 'rb') as f:
+        loaded = load(f)
+    print('Binary file read.')
+    print(', '.join([str(s) for s in loaded]))
+    print()
 
     # Demonstrate JSON encoding/decoding of Playlist objects
     # Single object
+    pl_json = json.dumps(pl, default=playlist_py_to_json, indent=4)
+    print(pl_json)
+    pl_py = json.loads(pl_json, object_hook=playlist_json_to_py)
     print()
+    print(pl_py)
+    print()
+    # print(pl_py.__dict__)
+    # print(pl.__dict__)
+    # print()
+    # print(pl_py == pl)
+    # print()
 
     # List of objects
+    pls_json = json.dumps([pl, pl], default=playlist_py_to_json, indent=4)
+    print(pls_json)
+    pls_py = json.loads(pls_json, object_hook=playlist_json_to_py)
+    # print(pls_py)
+    for p in pls_py:
+        print(p)
     print()
 
-    # def test():
-    #     s = 'Imagine; Love (unplugged); Across the Universe; Happiness is a Warm Gun'
-    #     print(s.split('; '))
-    #     # print(pl_str)
-    #     songs = [Song.from_str(song_string) for song_string in s.split('; ')]
-    #     # for song in songs:
-    #     #     print(song.title)
-    #     s_split = s.split('; ')
-    #     print(Song.from_str(s.split('; ')[3]))
-    #
-    # test()
+

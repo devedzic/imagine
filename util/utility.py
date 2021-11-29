@@ -20,6 +20,8 @@ def date_py_to_json(a_date):
     not as the default= parameter in json.dumps() (which creates "\"<iso_date_str>\"", not "<iso_date_str>" strings).
     """
 
+    return a_date.isoformat() if isinstance(a_date, date) else 'null'
+
 
 def date_json_to_py(iso_date):
     """Converts string formatted as 'YYYY-mm-dd' to datetime.date object.
@@ -27,10 +29,14 @@ def date_json_to_py(iso_date):
     not as the object_hook= parameter in json.loads().
     """
 
+    return date.fromisoformat(iso_date)
+
 
 def get_project_dir():
     """Returns the Path object corresponding to the project root directory.
     """
+
+    return PROJECT_DIR
 
 
 def get_data_dir():
@@ -38,10 +44,17 @@ def get_data_dir():
     (by convention located right under the project root directory).
     """
 
+    data_dir = PROJECT_DIR / 'data'
+    data_dir.mkdir(parents=True, exist_ok=True)
+    return data_dir
+
 
 if __name__ == '__main__':
 
     pass
+
+    # Demonstrate format_date()
+    print()
 
     # Demonstrate pathlib.Path
     # - user's home dir: Path.home()
@@ -52,5 +65,14 @@ if __name__ == '__main__':
     #            <newDir>.mkdir(parents=True, exist_ok=True)
     # - remove dir: <dir>.rmdir()                                           # requires the <dir> to be empty
     # - project dir: settings.PROJECT_DIR
+    print(Path.home())
+    print(Path())
+    print(Path('.'))
+    print(Path.cwd())
+    print(Path('.').absolute())
+    print()
 
     # Demonstrate get_project_dir(), get_data_dir()
+    print(get_project_dir())
+    print(get_data_dir())
+

@@ -84,7 +84,7 @@ class Song:
 
         # return self.title + ' (unplugged)' if self.is_unplugged else self.title
         t = song_string.split(' (unplugged)')[0]
-        u = True if '(unplugged)' in song_string else False
+        u = True if song_string.endswith(' (unplugged)') else False
         return cls(t, u)
 
 
@@ -95,8 +95,8 @@ class SongEncoder(json.JSONEncoder):
     def default(self, song):
         # recommendation: always use double quotes with JSON
 
-        pass
         # can simply return song_py_to_json(song), to avoid code duplication
+        return song_py_to_json(song)
 
 
 def song_py_to_json(song):
@@ -105,10 +105,32 @@ def song_py_to_json(song):
 
     # recommendation: always use double quotes with JSON
 
+    if isinstance(song, Song):
+        return {"__Song__": song.__dict__}
+        # return {"Song": song.__dict__}
+    # else:
+    #     raise TypeError(f'expected Song object, passed {song.__class__.__name__} object')
+    raise TypeError(f'expected Song object, passed {song.__class__.__name__} object')
+
 
 def song_json_to_py(song_json):
     """JSON decoder for Song objects (object_hook= parameter in json.loads()).
+
+    It is essential to run this code in the debugger. If the breakpoint is set at the very first line (the if statement)
+    it is possible to see that, internally, this function runs TWICE per call (!!!) -
+    the first time the if statement evaluates to False because the first time song_json does not include "__Song__" (!),
+    and the return song_json actually does not return to the calling point but to some idiosyncratic Python functions
+    that do some internal witchcraft; when they are done, this function resurrects at the if statement again and
+    suddenly song_json DOES include "__Song__" and everything works fine (!?!?!).
     """
+
+    if "__Song__" in song_json:
+    # if "Song" in song_json:
+        s = Song('')
+        s.__dict__.update(song_json["__Song__"])
+        # s.__dict__.update(song_json["Song"])
+        return s
+    return song_json
 
 
 class Ballad(Song):
@@ -121,20 +143,17 @@ class Ballad(Song):
     """
 
     # # Version 1 - no multiple inheritance
-    #
-    # def __init__(self, title, tempo: Tempo, is_unplugged=False):
+    # def __init__(self, title, is_unplugged=False, tempo=Tempo.SLOW):
     #     super().__init__(title, is_unplugged)
-    #     # self.tempo = tempo if isinstance(tempo, Tempo) else 'unknown'
     #     self.tempo = tempo
 
     # Version 2 - with multiple inheritance
-
-    def __init__(self, tempo: Tempo, **kwargs):
+    def __init__(self, tempo=Tempo.SLOW, **kwargs):
         super().__init__(**kwargs)
         self.tempo = tempo
 
     def __str__(self):
-        return super().__str__() + f'; {self.tempo.name.lower()}'
+        return super().__str__() + '; ballad'
 
     def __eq__(self, other):
         # Recommended if inheritance is involved
@@ -143,7 +162,7 @@ class Ballad(Song):
         #     return self.__dict__ == other.__dict__
         # return False
 
-        return self.__dict__ == other.__dict__ if type(other) is type(self) else False
+        return self.__dict__ == other.__dict__ if type(self) is type(other) else False
 
     def play(self, artist, *args, **kwargs):
         """Assumes that artist, *args (e.g. expressions of gratitude) and kwargs.values() (e.g. messages) are strings.
@@ -151,8 +170,8 @@ class Ballad(Song):
             <song>.play(artist, *['Thank you!', 'You're wonderful!], love='We love you!')
         """
 
-        print('Ballad')
         super().play(artist, *args, **kwargs)
+        print('ballad')
 
 
 class PianoSong(Song):
@@ -162,14 +181,12 @@ class PianoSong(Song):
     """
 
     # # Version 1 - no multiple inheritance
-    #
-    # def __init__(self, title, is_unplugged=False, instrument: Instrument = Instrument.PIANO):
+    # def __init__(self, title, is_unplugged=False, instrument=Instrument.PIANO):
     #     super().__init__(title, is_unplugged)
     #     self.instrument = instrument
 
     # Version 2 - with multiple inheritance
-
-    def __init__(self, instrument: Instrument = Instrument.PIANO, **kwargs):
+    def __init__(self, instrument=Instrument.PIANO, **kwargs):
         super().__init__(**kwargs)
         self.instrument = instrument
 
@@ -189,9 +206,7 @@ class PianoSong(Song):
         """Just a simple method to indicate details of a piano song.
         """
 
-        print(f'{self.title}')
-        print('piano-dominated song')
-        print('unplugged') if self.is_unplugged else print('amplified')
+        print(f'{self.title} is a nice {self.instrument.name.lower()} song :)')
 
 
 class PianoBallad(Ballad, PianoSong):
@@ -269,17 +284,14 @@ if __name__ == "__main__":
     # - o.__dict__
 
     # Demonstrate object data fields and methods for Musician objects
-    print(imagine.__class__)
-    print(imagine.__class__.__name__)
-    print(imagine.__dir__)
     print(imagine.__dir__())
     print(imagine.__dict__)
+    print(imagine.__class__.__name__)
     print()
 
     # Demonstrate @classmethod (from_str())
-    s = imagine.__str__()
-    print(s)
-    print(imagine.from_str(s))
+    print(imagine.from_str(imagine.__str__()))
+    print(Song.from_str(imagine.__str__()))
     print()
 
     # Demonstrate inheritance
@@ -289,32 +301,25 @@ if __name__ == "__main__":
     #   object class defines object.__eq__(self, other) etc.
     #   object.__ne__(self, other), the inverse of object.__eq__(self, other),
     #   is provided by Python automatically once object.__eq__(self, other) is implemented
-    print(list.__mro__)
+    patience = Ballad(title='Patience', is_unplugged=True, tempo=Tempo.SLOW)
+    print(patience)
+    print(patience == Ballad(title='Patience', is_unplugged=True, tempo=Tempo.SLOW))
     print()
-    # oh_darling = Ballad('Oh, Darling!', Tempo.MODERATE, )
-    oh_darling = Ballad(title='Oh, Darling!', tempo=Tempo.MODERATE, )
-    print(oh_darling)
-    # print(oh_darling == Ballad('Oh, Darling!', Tempo.MODERATE, is_unplugged=True))
-    print(oh_darling == Ballad(title='Oh, Darling!', tempo=Tempo.MODERATE, is_unplugged=True))
-    print()
-    # let_it_be = PianoSong('Let It Be')
-    let_it_be = PianoSong(title='Let It Be')
+    let_it_be = PianoSong(title='Let It Be', )
     print(let_it_be)
-    # print(let_it_be == PianoSong('Let It Be'))
-    print(let_it_be == PianoSong(title='Let It Be'))
+    print(let_it_be == PianoSong(title='Let It Be', ))
+    let_it_be.details()
     print()
 
     # Demonstrate method overriding
-    imagine.play('John Lennon')
-    print()
-    oh_darling.play('Paul McCartney')
+    patience.play('Guns & Roses', *['Axel Rose', 'Slash'], hit=True)
     print()
 
     # Demonstrate multiple inheritance and MRO.
     # Make sure to read this first: https://stackoverflow.com/a/50465583/1899061 (especially Scenario 3).
-    love = PianoBallad(title='Love', tempo=Tempo.SLOW, is_unplugged=True)
-    print(love)
-    print(love == PianoBallad(title='Love', tempo=Tempo.SLOW, is_unplugged=True))
+    hey_jude = PianoBallad(title='Hey Jude', is_unplugged=False, instrument=Instrument.PIANO, tempo=Tempo.MODERATE)
+    print(hey_jude)
+    print(hey_jude == PianoBallad(title='Hey Jude', is_unplugged=False, instrument=Instrument.PIANO, tempo=Tempo.MODERATE))
     print(PianoBallad.__mro__)
     print()
 
@@ -322,10 +327,27 @@ if __name__ == "__main__":
     # Refer to https://docs.python.org/3.3/library/json.html#encoders-and-decoders for details.
     print()
 
-    # Demonstrate JSON encoding/decoding of Musician objects
+    # Demonstrate JSON encoding/decoding of Song objects
     # Single object
+    imagine_json = json.dumps(imagine, cls=SongEncoder, indent=4)
+    print(imagine_json)
+    print()
+    imagine_json = json.dumps(imagine, default=song_py_to_json, indent=4)
+    print(imagine_json)
+    print()
+    # imagine_py = json.loads(str(imagine_json), object_hook=song_json_to_py)
+    imagine_py = json.loads(imagine_json, object_hook=song_json_to_py)
+    print(imagine_py)
     print()
 
+    # Try an object of different type
+    # hey_jude_json = json.dumps(hey_jude, default=song_py_to_json, indent=4)
+
     # List of objects
+    from testdata.songs import *
+    songs = [across_the_universe, happiness_is_a_warm_gun, imagine, love]
+    songs_json = json.dumps(songs, default=song_py_to_json, indent=4)
+    songs_py = json.loads(songs_json, object_hook=song_json_to_py)
+    print(songs == songs_py)
     print()
 

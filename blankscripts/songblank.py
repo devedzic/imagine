@@ -148,6 +148,8 @@ class PianoSong(Song):
         """Just a simple method to indicate details of a piano song.
         """
 
+        pass
+
 
 class PianoBallad(Ballad, PianoSong):
     """The class describing the concept of piano ballad.
@@ -228,7 +230,7 @@ if __name__ == "__main__":
     # Refer to https://docs.python.org/3.3/library/json.html#encoders-and-decoders for details.
     print()
 
-    # Demonstrate JSON encoding/decoding of Musician objects
+    # Demonstrate JSON encoding/decoding of Song objects
     # Single object
     print()
 
