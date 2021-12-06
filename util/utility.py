@@ -20,7 +20,7 @@ def date_py_to_json(a_date):
     not as the default= parameter in json.dumps() (which creates "\"<iso_date_str>\"", not "<iso_date_str>" strings).
     """
 
-    return a_date.isoformat() if isinstance(a_date, date) else 'null'
+    return a_date.isoformat() if isinstance(a_date, date) else "null"
 
 
 def date_json_to_py(iso_date):
@@ -65,14 +65,10 @@ if __name__ == '__main__':
     #            <newDir>.mkdir(parents=True, exist_ok=True)
     # - remove dir: <dir>.rmdir()                                           # requires the <dir> to be empty
     # - project dir: settings.PROJECT_DIR
-    print(Path.home())
-    print(Path())
-    print(Path('.'))
-    print(Path.cwd())
-    print(Path('.').absolute())
     print()
 
     # Demonstrate get_project_dir(), get_data_dir()
     print(get_project_dir())
     print(get_data_dir())
+    print()
 

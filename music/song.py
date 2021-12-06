@@ -104,13 +104,9 @@ def song_py_to_json(song):
     """
 
     # recommendation: always use double quotes with JSON
-
     if isinstance(song, Song):
         return {"__Song__": song.__dict__}
-        # return {"Song": song.__dict__}
-    # else:
-    #     raise TypeError(f'expected Song object, passed {song.__class__.__name__} object')
-    raise TypeError(f'expected Song object, passed {song.__class__.__name__} object')
+    raise TypeError('expected Song object')
 
 
 def song_json_to_py(song_json):
@@ -125,10 +121,8 @@ def song_json_to_py(song_json):
     """
 
     if "__Song__" in song_json:
-    # if "Song" in song_json:
         s = Song('')
         s.__dict__.update(song_json["__Song__"])
-        # s.__dict__.update(song_json["Song"])
         return s
     return song_json
 
@@ -330,24 +324,17 @@ if __name__ == "__main__":
     # Demonstrate JSON encoding/decoding of Song objects
     # Single object
     imagine_json = json.dumps(imagine, cls=SongEncoder, indent=4)
+    # imagine_json = json.dumps(imagine, default=song_py_to_json, indent=4)
     print(imagine_json)
     print()
-    imagine_json = json.dumps(imagine, default=song_py_to_json, indent=4)
-    print(imagine_json)
-    print()
-    # imagine_py = json.loads(str(imagine_json), object_hook=song_json_to_py)
     imagine_py = json.loads(imagine_json, object_hook=song_json_to_py)
     print(imagine_py)
     print()
 
-    # Try an object of different type
+    # # Try an object of different type
     # hey_jude_json = json.dumps(hey_jude, default=song_py_to_json, indent=4)
 
     # List of objects
-    from testdata.songs import *
-    songs = [across_the_universe, happiness_is_a_warm_gun, imagine, love]
-    songs_json = json.dumps(songs, default=song_py_to_json, indent=4)
-    songs_py = json.loads(songs_json, object_hook=song_json_to_py)
-    print(songs == songs_py)
+
     print()
 

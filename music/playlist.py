@@ -1,7 +1,7 @@
 """The class representing the concept of playlist.
 It includes a list of Song objects and the dates when the playlist was created and completed.
 """
-
+import pickle
 from datetime import date, datetime, time
 from pathlib import Path
 import sys
@@ -114,8 +114,9 @@ class PlaylistDateError(PlaylistError):
     """Exception raised when the date when a playlist was created is after the date when the playlist was completed.
     """
 
-    def __init__(self, creation_date, completion_date):
-        self.message = f'playlist creation date ({creation_date}) after playlist completion date ({completion_date}).'
+    # define __init__() to include an appropriate message if the input args (created, completed) dates are not OK
+    def __init__(self, created, completed):
+        self.message = f'date created ({created}) after date completed ({completed})\n\n'
 
 
 class PlaylistEncoder(json.JSONEncoder):
@@ -138,17 +139,19 @@ def playlist_py_to_json(playlist):
         d["created"] = date_py_to_json(playlist.created)
         d["completed"] = date_py_to_json(playlist.completed)
         return {"__Playlist__": d}
-    return {f"__{playlist.__class__.__name__}__": playlist.__dict__}
+    raise TypeError('not a Playlist object')
 
 
 def playlist_json_to_py(playlist_json):
     """JSON decoder for Playlist objects (object_hook= parameter in json.loads()).
     """
 
+    # The songs field is specified as *songs in Playlist.__init__(),
+    # make sure to use tuple(json.loads(<songs in playlist_json>))
+
     if "__Playlist__" in playlist_json:
-        d = playlist_json["__Playlist__"]
         p = Playlist('')
-        p.name = d["name"]
+        d = playlist_json["__Playlist__"]
         p.songs = tuple(json.loads(d["songs"], object_hook=song_json_to_py))
         p.created = date_json_to_py(d["created"])
         p.completed = date_json_to_py(d["completed"])
@@ -220,92 +223,79 @@ if __name__ == "__main__":
     # Demonstrate exceptions
     # Here's the hierarchy of built-in exceptions: https://docs.python.org/3/library/exceptions.html#exception-hierarchy
 
-    # # Demonstrate exceptions - the general structure of try-except statements, possibly including else and finally
-    # songs = [across_the_universe, imagine, happiness_is_a_warm_gun, love]
+    # Demonstrate exceptions - the general structure of try-except statements, possibly including else and finally
+    songs = [love, happiness_is_a_warm_gun, across_the_universe, imagine]
+    # # print(3 / 0)
+    # # print(songs[4])
     # try:
-    #     # print(songs[3])
-    #     print(3/0)
-    # except IndexError:
-    #     print('Caught an IndexError!')
-    # except:
-    #     print('Caught an Exception!')
+    #     # print(3/0)
+    #     print(songs[6])
+    # except ZeroDivisionError:
+    #     # print('Zero division')
+    #     sys.stderr.write('Zero division')
+    # except IndexError as e:
+    #     # sys.stderr.write(str(e.args))
+    #     sys.stderr.write(e.args[0])
     # else:
-    #     print('This is printed in the else clause - the try block has completed normally.')
+    #     print('Nothing irregular happened')
     # finally:
-    #     print('This is printed in the finally clause, '
-    #           'regardless of whether the try block has completed normally or not.')
-    # print()
+    #     print('And this runs regardless...')
+    print()
 
-    # # Demonstrate exceptions - except: Exception as <e> (and then type(<e>), <e>.__class__.__name__, <e>.args,...)
-    # try:
-    #     print(songs[4])
-    # except Exception as e:
-    #     print('Caught an Exception:', e)
-    #     print('Caught an Exception:', type(e))
-    #     print('Caught an Exception:', e.__class__.__name__)
-    #     print('Caught an Exception:', e.args)
-    # print()
+    # Demonstrate exceptions - except: Exception as <e> (and then type(<e>), <e>.__class__.__name__, <e>.args,...)
+    print()
 
     # # Demonstrate exceptions - user-defined exceptions (wrong playlist date(s))
+    # p = Playlist('My playlist')
     # try:
-    #     pl = Playlist('My songs', *songs, created=date(2012, 4, 6), completed=date.today())
-    #     print(pl)
-    #     # print(3/0)
+    #     p = Playlist('My playlist', *songs, created=date(2022, 2, 3), completed=date.today())
+    #     print(p)
     # except PlaylistDateError as e:
-    #     # sys.stderr.write(f'Caught a {e}\n')
-    #     # sys.stderr.write(f'Caught a {e.__class__.__name__}: {e.args[0]}\n')
-    #     # sys.stderr.write(f'Caught a {e.__class__.__name__}: {e.message}\n')
-    #     sys.stderr.write(f'Caught a {e.__class__.__name__}: {e.args[0]}, {e.message}\n')
-    #     raise
-    # except Exception as e:
-    #     sys.stderr.write(f'Caught a {e.__class__.__name__}: {e.args[0]}\n')
+    #     sys.stderr.write(e.__class__.__name__ + ': ' + e.message)
     #     raise
     # print()
 
     # # Demonstrate writing to a text file - <outfile>.write(), <outfile>.writelines()
-    # songs = [across_the_universe, imagine, love, happiness_is_a_warm_gun]
     # file = get_data_dir() / 'songs.txt'
     # with open(file, 'w') as f:
-    #     # for song in songs:
-    #     #     f.write(str(song) + '\n')
-    #     f.writelines([str(song) + '\n' for song in songs])
-    # print('Text file created.')
+    #     # for s in songs:
+    #     #     f.write(str(s) + '\n')
+    #     f.writelines([str(s) + '\n' for s in songs])
+    # print('Done')
     # print()
-    #
+
     # # Demonstrate reading from a text file - <infile>.read(), <infile>.readline()
-    # songs1 = []
+    # file = get_data_dir() / 'songs.txt'
     # with open(file, 'r') as f:
-    #     # # s = f.read()
-    #     # s = f.read().rstrip()
-    #     # print(s)
-    #     # print(type(s))
-    #     # print()
-    #     # songs1 = [Song.from_str(song_str) for song_str in s.split('\n')]
-    #     # print(', '.join([str(s) for s in songs1]))
+    #     # # for s in songs:
+    #     # #     f.write(str(s) + '\n')
+    #     # lines = f.read().rstrip()
+    #     lines = ''
     #     while True:
-    #         s = f.readline().rstrip()
-    #         if s:
-    #             songs1.append(Song.from_str(s))
+    #         line = f.readline()
+    #         if line:
+    #             lines = lines + line
     #         else:
     #             break
-    # print(songs1)
-    # print(', '.join([str(s) for s in songs1]))
+    # # print(lines)
+    # songs1 = [Song.from_str(line) for line in lines.split('\n')]
+    # print('; '.join([str(s) for s in songs1]))
+    # print('Done')
     # print()
 
     # Demonstrate writing to a binary file - pickle.dump()
-    songs = [across_the_universe, imagine, love, happiness_is_a_warm_gun]
-    file = get_data_dir() / 'songs.binary'
-    with open(file, 'wb') as f:
-        dump(songs, f)
-    print('Binary file created.')
+    # file = get_data_dir() / 'songs.binary'
+    # with open(file, 'wb') as f:
+    #     pickle.dump(songs, f)
+    # print('Done')
     print()
 
-    # Demonstrate reading from a binary file - pickle.load()
-    loaded = []
-    with open (file, 'rb') as f:
-        loaded = load(f)
-    print('Binary file read.')
-    print(', '.join([str(s) for s in loaded]))
+    # # Demonstrate reading from a binary file - pickle.load()
+    # file = get_data_dir() / 'songs.binary'
+    # with open(file, 'rb') as f:
+    #     songs1 = pickle.load(f)
+    # print('Done')
+    # print('; '.join([str(s) for s in songs1]))
     print()
 
     # Demonstrate JSON encoding/decoding of Playlist objects
@@ -313,21 +303,13 @@ if __name__ == "__main__":
     pl_json = json.dumps(pl, default=playlist_py_to_json, indent=4)
     print(pl_json)
     pl_py = json.loads(pl_json, object_hook=playlist_json_to_py)
-    print()
     print(pl_py)
     print()
-    # print(pl_py.__dict__)
-    # print(pl.__dict__)
-    # print()
-    # print(pl_py == pl)
-    # print()
 
     # List of objects
-    pls_json = json.dumps([pl, pl], default=playlist_py_to_json, indent=4)
-    print(pls_json)
-    pls_py = json.loads(pls_json, object_hook=playlist_json_to_py)
-    # print(pls_py)
-    for p in pls_py:
+    pll_json = json.dumps([pl, pl], default=playlist_py_to_json, indent=4)
+    pll_py = json.loads(pll_json, object_hook=playlist_json_to_py)
+    for p in pll_py:
         print(p)
     print()
 
